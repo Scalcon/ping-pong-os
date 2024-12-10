@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall
 
 # Source files
-SRCS = ppos-core-aux.c ppos-core-ipc.c signal-test.c
+SRCS = ppos-core-aux.c ppos-core-ipc.c pingpong-semaphore.c
 
 # Object files
 OBJS = queue.o ppos-all.o
