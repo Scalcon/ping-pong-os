@@ -24,13 +24,33 @@ int sem_down(semaphore_t *s)
 
     PPOS_PREEMPT_DISABLE;
     s->counter--;
-    
-    
+    if (s->counter < 0) {
+        task_suspend(taskExec, &(s->queue));
+
+        PPOS_PREEMPT_ENABLE;
+
+        task_yield();
+
+        // If the task was woken up due to a sem_destroy, return -1.
+        if (!(s->active)) {
+            return -1;
+        }
+        return 0;
+    }
     return 0;
 }
 
 int sem_up(semaphore_t *s)
 {
+    if (s == NULL || !s->active) {
+        return -1;
+    }
+    PPOS_PREEMPT_DISABLE;
+    s->counter++;
+    if (s->counter <= 0) {
+        task_resume(s->queue);
+    }
+    PPOS_PREEMPT_ENABLE;
     return 0;
 }
 
