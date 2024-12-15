@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall
 
 # Source files
-COMMON_SRCS = ppos-core-aux.c ppos-core-ipc.c
+COMMON_SRCS = ppos-core-aux.c
 MQUEUE_SRCS = pingpong-mqueue.c
 RACECOND_SRCS = pingpong-racecond.c
 SEMAPHORE_SRCS = pingpong-semaphore.c
@@ -14,9 +14,9 @@ SEMAPHORE_SRCS = pingpong-semaphore.c
 OBJS = queue.o ppos-all.o
 
 # Output executables
-MQUEUE_TARGET = ppos-mqueue
-RACECOND_TARGET = ppos-racecond
-SEMAPHORE_TARGET = ppos-semaphore
+MQUEUE_TARGET = mqueue
+RACECOND_TARGET = racecond
+SEMAPHORE_TARGET = semaphore
 
 LIBS = -lm
 

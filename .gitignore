@@ -1,5 +1,5 @@
 /.vscode/*
 /ppos
-/ppos-mqueue
-/ppos-racecond
-/ppos-semaphore
+/mqueue
+/racecond
+/semaphore

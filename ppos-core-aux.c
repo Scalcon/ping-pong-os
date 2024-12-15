@@ -2,6 +2,8 @@
 #include "ppos-core-globals.h"
 #include "ppos-disk-manager.h"
 
+#define DEBUG_SEM 1
+
 
 // ****************************************************************************
 // Coloque as suas modificações aqui, 
@@ -141,10 +143,22 @@ int after_task_join (task_t *task) {
     return 0;
 }
 
+// cria um semáforo
+int sem_create(semaphore_t* s, int counter) {
+    if (s == NULL) {
+        return -1;
+    }
+    PPOS_PREEMPT_DISABLE; //disable preemtion to allow atomicity
+    s->queue = NULL;
+    s->counter = counter;
+    s->active = 1;
+    PPOS_PREEMPT_ENABLE; //enables again
+    return 0;
+}
 
 int before_sem_create (semaphore_t *s, int value) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_create - BEFORE - [%d]", taskExec->id);
 #endif
     return 0;
@@ -152,15 +166,35 @@ int before_sem_create (semaphore_t *s, int value) {
 
 int after_sem_create (semaphore_t *s, int value) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_create - AFTER - [%d]", taskExec->id);
 #endif
     return 0;
 }
 
+// requisita o semáforo
+int sem_down(semaphore_t* s) {
+    if (s == NULL || !(s->active)) {
+        return -1;
+    }
+    PPOS_PREEMPT_DISABLE;
+    s->counter--;
+    if (s->counter < 0) {
+        task_suspend(taskExec, &(s->queue));
+        PPOS_PREEMPT_ENABLE;
+        task_yield();
+        if (!(s->active)) {
+            return -1;
+        }
+        return 0;
+    }
+    PPOS_PREEMPT_ENABLE;
+    return 0;
+}
+
 int before_sem_down (semaphore_t *s) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_down - BEFORE - [%d]", taskExec->id);
 #endif
     return 0;
@@ -168,15 +202,29 @@ int before_sem_down (semaphore_t *s) {
 
 int after_sem_down (semaphore_t *s) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_down - AFTER - [%d]", taskExec->id);
 #endif
     return 0;
 }
 
+// libera o semáforo
+int sem_up(semaphore_t* s) {
+    PPOS_PREEMPT_DISABLE;
+    if (s == NULL || !(s->active)) {
+        return -1;
+    }
+    s->counter++;
+    if (s->counter <= 0) {
+        task_resume(s->queue);
+    }
+    PPOS_PREEMPT_ENABLE;
+    return 0;
+}
+
 int before_sem_up (semaphore_t *s) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_up - BEFORE - [%d]", taskExec->id);
 #endif
     return 0;
@@ -184,15 +232,30 @@ int before_sem_up (semaphore_t *s) {
 
 int after_sem_up (semaphore_t *s) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_up - AFTER - [%d]", taskExec->id);
 #endif
     return 0;
 }
 
+// destroi o semáforo
+int sem_destroy(semaphore_t* s) {
+    if (s == NULL || !(s->active)) {
+        return -1;
+    }
+    PPOS_PREEMPT_DISABLE;
+    s->active = 0;
+    while (s->queue != NULL) {
+        task_resume(s->queue);
+    }
+    PPOS_PREEMPT_ENABLE;
+
+    return 0;
+}
+
 int before_sem_destroy (semaphore_t *s) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_destroy - BEFORE - [%d]", taskExec->id);
 #endif
     return 0;
@@ -200,7 +263,7 @@ int before_sem_destroy (semaphore_t *s) {
 
 int after_sem_destroy (semaphore_t *s) {
     // put your customization here
-#ifdef DEBUG
+#ifdef DEBUG_SEM
     printf("\nsem_destroy - AFTER - [%d]", taskExec->id);
 #endif
     return 0;
