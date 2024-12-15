@@ -5,21 +5,36 @@ CC = gcc
 CFLAGS = -Wall
 
 # Source files
-SRCS = ppos-core-aux.c ppos-core-ipc.c pingpong-semaphore.c
+COMMON_SRCS = ppos-core-aux.c
+MQUEUE_SRCS = pingpong-mqueue.c
+RACECOND_SRCS = pingpong-racecond.c
+SEMAPHORE_SRCS = pingpong-semaphore.c
 
 # Object files
 OBJS = queue.o ppos-all.o
 
-# Output executable
-TARGET = ppos
+# Output executables
+MQUEUE_TARGET = mqueue
+RACECOND_TARGET = racecond
+SEMAPHORE_TARGET = semaphore
+
+LIBS = -lm
 
 # Default rule
-all: clean $(TARGET)
+all: clean $(MQUEUE_TARGET) $(RACECOND_TARGET) $(SEMAPHORE_TARGET)
 
-# Linking
-$(TARGET): $(SRCS) $(OBJS)
-	$(CC) $(CFLAGS) $(SRCS) $(OBJS) -o $(TARGET)
+# Linking for mqueue
+$(MQUEUE_TARGET): $(COMMON_SRCS) $(MQUEUE_SRCS) $(OBJS)
+	$(CC) $(CFLAGS) $(COMMON_SRCS) $(MQUEUE_SRCS) $(OBJS) -o $(MQUEUE_TARGET) $(LIBS)
+
+# Linking for racecond
+$(RACECOND_TARGET): $(COMMON_SRCS) $(RACECOND_SRCS) $(OBJS)
+	$(CC) $(CFLAGS) $(COMMON_SRCS) $(RACECOND_SRCS) $(OBJS) -o $(RACECOND_TARGET) $(LIBS)
+
+# Linking for semaphore
+$(SEMAPHORE_TARGET): $(COMMON_SRCS) $(SEMAPHORE_SRCS) $(OBJS)
+	$(CC) $(CFLAGS) $(COMMON_SRCS) $(SEMAPHORE_SRCS) $(OBJS) -o $(SEMAPHORE_TARGET) $(LIBS)
 
 # Clean rule
 clean:
-	rm -f $(TARGET)
+	rm -f $(MQUEUE_TARGET) $(RACECOND_TARGET) $(SEMAPHORE_TARGET)
