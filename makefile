@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall
 
 # Source files
-COMMON_SRCS = ppos-core-aux.c ppos-ipc.c
+COMMON_SRCS = ppos-core-aux.c ppos-core-ipc.c
 MQUEUE_SRCS = pingpong-mqueue.c
 RACECOND_SRCS = pingpong-racecond.c
 SEMAPHORE_SRCS = pingpong-semaphore.c

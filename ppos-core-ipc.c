@@ -1,95 +1,64 @@
-// souce code of the semaphore implementation
-// author: Rodrigo, Scalcon
 #include "ppos.h"
 #include "ppos-core-globals.h"
 
-// create the semaphore: sem_init
-int sem_create(semaphore_t *s, int value)
-{
-    if (s == NULL)
+
+// cria um semáforo
+int sem_create(semaphore_t* s, int counter) {
+    if (s == NULL) {
         return -1;
-    PPOS_PREEMPT_DISABLE; // disable preemption to stop race conditions
-    s->counter = value;
+    }
+    PPOS_PREEMPT_DISABLE;
     s->queue = NULL;
+    s->counter = counter;
     s->active = 1;
-    PPOS_PREEMPT_ENABLE; // enable preemption again
+    PPOS_PREEMPT_ENABLE;
     return 0;
 }
 
-int sem_down(semaphore_t *s)
-{
-    if (s == NULL || !s->active)
-    {
+// requisita o semáforo
+int sem_down(semaphore_t* s) {
+    if (s == NULL || !(s->active)) {
         return -1;
     }
-
     PPOS_PREEMPT_DISABLE;
     s->counter--;
-    if (s->counter < 0)
-    {
+    if (s->counter < 0) {
         task_suspend(taskExec, &(s->queue));
-
         PPOS_PREEMPT_ENABLE;
-
         task_yield();
-
-        // If the task was woken up due to a sem_destroy, return -1.
-        if (!(s->active))
-        {
+        if (!(s->active)) {
             return -1;
         }
         return 0;
     }
-    #ifdef PPOS_TIME_SHARING
-    if(((task_data_t*)taskExec->custom_data)->quantum <= 0) {
-        PPOS_PREEMPT_ENABLE;
-        task_yield();
-    }
-    #endif
-    PPOS_PREEMPT_ENABLE; // Retoma preempção
+    PPOS_PREEMPT_ENABLE;
     return 0;
 }
 
-int sem_up(semaphore_t *s)
-{
-    if (s == NULL || !s->active)
-    {
+// libera o semáforo
+int sem_up(semaphore_t* s) {
+    PPOS_PREEMPT_DISABLE;
+    if (s == NULL || !(s->active)) {
         return -1;
     }
-    PPOS_PREEMPT_DISABLE;
     s->counter++;
-    if (s->counter <= 0)
-    {
+    if (s->counter <= 0) {
         task_resume(s->queue);
     }
-
-    #ifdef PPOS_TIME_SHARING
-    if(((task_data_t*)taskExec->custom_data)->quantum <= 0) {
-        PPOS_PREEMPT_ENABLE; // Retoma preempção
-        //printf("\tSEM_UP-Quantum"); fflush(stdout);
-        task_yield();
-    }
-    #endif
-
-
+    PPOS_PREEMPT_ENABLE;
     return 0;
 }
 
-// destroy the semaphore and wake up all tasks that are waiting for it
-int sem_destroy(semaphore_t *s)
-{
-    if (s == NULL || !s->active)
-    {
+// destroi o semáforo
+int sem_destroy(semaphore_t* s) {
+    if (s == NULL || !(s->active)) {
         return -1;
     }
     PPOS_PREEMPT_DISABLE;
     s->active = 0;
-
-    while (s->queue != NULL)
-    {
+    while (s->queue != NULL) {
         task_resume(s->queue);
     }
-
     PPOS_PREEMPT_ENABLE;
 
     return 0;
