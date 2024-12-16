@@ -1,0 +1,61 @@
+// cria um semáforo
+int sem_create(semaphore_t* s, int counter) {
+    if (s == NULL) {
+        return -1;
+    }
+    PPOS_PREEMPT_DISABLE; //disable preemtion to allow atomicity
+    s->queue = NULL;
+    s->counter = counter;
+    s->active = 1;
+    PPOS_PREEMPT_ENABLE; //enables again
+    return 0;
+}
+
+// requisita o semáforo
+int sem_down(semaphore_t* s) {
+    if (s == NULL || !(s->active)) {
+        return -1;
+    }
+    PPOS_PREEMPT_DISABLE;
+    s->counter--;
+    if (s->counter < 0) {
+        task_suspend(taskExec, &(s->queue));
+        PPOS_PREEMPT_ENABLE;
+        task_yield();
+        if (!(s->active)) {
+            return -1;
+        }
+        return 0;
+    }
+    PPOS_PREEMPT_ENABLE;
+    return 0;
+}
+
+// libera o semáforo
+int sem_up(semaphore_t* s) {
+    PPOS_PREEMPT_DISABLE;
+    if (s == NULL || !(s->active)) {
+        return -1;
+    }
+    s->counter++;
+    if (s->counter <= 0) {
+        task_resume(s->queue);
+    }
+    PPOS_PREEMPT_ENABLE;
+    return 0;
+}
+
+// destroi o semáforo
+int sem_destroy(semaphore_t* s) {
+    if (s == NULL || !(s->active)) {
+        return -1;
+    }
+    PPOS_PREEMPT_DISABLE;
+    s->active = 0;
+    while (s->queue != NULL) {
+        task_resume(s->queue);
+    }
+    PPOS_PREEMPT_ENABLE;
+
+    return 0;
+}
