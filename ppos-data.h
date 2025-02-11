@@ -15,21 +15,33 @@
 typedef struct task_t
 {
    struct task_t *prev, *next ;		// ponteiros para usar em filas
-   int id ;				// identificador da tarefa
-   ucontext_t context ;			// contexto armazenado da tarefa
-   unsigned char state;  // indica o estado de uma tarefa (ver defines no final do arquivo ppos.h): 
-                          // n - nova, r - pronta, x - executando, s - suspensa, e - terminada
+   int id ;			            	// identificador da tarefa
+   ucontext_t context ;	    		// contexto armazenado da tarefa
+   unsigned char state;             // indica o estado de uma tarefa (ver defines no final do arquivo ppos.h): 
+                                    // n - nova, r - pronta, x - executando, s - suspensa, e - terminada
    struct task_t* queue;
    struct task_t* joinQueue;
    int exitCode;
-   unsigned int awakeTime; // used to store the time when it should be waked up
+   unsigned int awakeTime;          // used to store the time when it should be waked up
 
-   void* custom_data; // internal data - do not modify!
+   void* custom_data;               // internal data - do not modify!
 
    // ... (outros/novos campos deve ser adicionados APOS esse comentario)
-
+   unsigned char sys_task;          // indica se a tarefa é do sistema ou não
 
 } task_t ;
+
+// estrutura que define uma tarefa de disco
+typedef struct disk_task_t{
+    task_t* task;
+    int operation;                  // indica qual operação a tarefa realizará 0 - read, 1 - write
+    void* buffer;                   // 
+    int block;                      // block number
+    long launch_time;               // 
+    long start_time;                // 
+    struct disk_task_t* prev;
+    struct disk_task_t* next;
+  } disk_task_t;
 
 // estrutura que define um semáforo
 typedef struct {

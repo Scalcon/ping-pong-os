@@ -460,17 +460,3 @@ int after_mqueue_msgs (mqueue_t *queue) {
 #endif
     return 0;
 }
-
-// Essa função implemeneta o escalonador de requisicoes de 
-// leitura/scrita do disco usado pelo gerenciador do disco
-// A função implementa a política FCFS.
-diskrequest_t* disk_scheduler(diskrequest_t* queue) {
-     // FCFS scheduler
-    if ( queue != NULL ) {
-        PPOS_PREEMPT_DISABLE
-        diskrequest_t* request = queue;
-        PPOS_PREEMPT_ENABLE
-        return request;
-    }
-    return NULL;
-}

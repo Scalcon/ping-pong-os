@@ -26,7 +26,11 @@ typedef struct diskrequest_t {
 // structura de dados que representa o disco para o SO
 typedef struct {
     // inserir os campos adicionais a partir daqui...
-    
+  int num_blocks;
+  int block_size;
+  int head_position;
+  int total_steps;
+  int total_time;
 } disk_t;
 
 
