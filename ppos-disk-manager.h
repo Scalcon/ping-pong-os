@@ -15,29 +15,18 @@
 
 // structura de dados que representa um pedido de leitura/escrita ao disco
 typedef struct diskrequest_t {
-    struct diskrequest_t* next;
-    struct diskrequest_t* prev;
+    struct diskrequest_t* next;  // pre-requisito para usar a biblioteca queue.h
+    struct diskrequest_t* prev;  // pre-requisito para usar a biblioteca queue.h
 
-    task_t* task;
-    unsigned char operation; // DISK_REQUEST_READ ou DISK_REQUEST_WRITE
-    int block;
-    void* buffer;
+    // inserir os campos adicionais a partir daqui... 
+    
 } diskrequest_t;
 
 // estrutura que representa um disco no sistema operacional
 // structura de dados que representa o disco para o SO
 typedef struct {
-    int numBlocks;
-    int blockSize;
-
-    semaphore_t semaforo;
-
-    unsigned char sinal;
-    unsigned char livre;
-
-    task_t* diskQueue;
-    semaphore_t semaforo_queue;
-    diskrequest_t* requestQueue;
+    // inserir os campos adicionais a partir daqui...
+    
 } disk_t;
 
 

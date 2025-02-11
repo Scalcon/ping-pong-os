@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include<signal.h>
+#include <signal.h>
 
 int parent_count = 5;
 int child_count = 5;
