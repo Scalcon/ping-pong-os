@@ -142,7 +142,6 @@ int disk_mgr_init(int *numblocks, int *blockSize) {
         PPOS_PREEMPT_ENABLE;
         return -1;
     }
-    disk_mgr_task.sys_task = 1;
 
     if (disk_cmd(DISK_CMD_INIT, 0, 0) < 0) {
         PPOS_PREEMPT_ENABLE;
