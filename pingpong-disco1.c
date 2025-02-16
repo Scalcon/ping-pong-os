@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ppos.h"
-#include "ppos_disk.h"
+#include "ppos-disk-manager.h"
 
 int numblocks ;			// numero de blocos no disco
 int blocksize ;			// tamanho de cada bloco (bytes)

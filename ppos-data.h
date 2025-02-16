@@ -31,17 +31,6 @@ typedef struct task_t
 
 } task_t ;
 
-// estrutura que define uma tarefa de disco
-typedef struct disk_task_t{
-    task_t* task;
-    int operation;                  // indica qual operação a tarefa realizará 0 - read, 1 - write
-    void* buffer;                   // 
-    int block;                      // block number
-    long launch_time;               // 
-    long start_time;                // 
-    struct disk_task_t* prev;
-    struct disk_task_t* next;
-  } disk_task_t;
 
 // estrutura que define um semáforo
 typedef struct {
