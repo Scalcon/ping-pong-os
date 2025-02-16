@@ -28,6 +28,9 @@ typedef struct task_t
 
    // ... (outros/novos campos deve ser adicionados APOS esse comentario)
    unsigned char sys_task;          // indica se a tarefa é do sistema ou não
+   int running_time;
+   int launch_timestamp;
+   unsigned int activations;
 
 } task_t ;
 

@@ -43,17 +43,18 @@ void after_task_create (task_t *task ) {
 
 void before_task_exit () {
     // put your customization here
-#ifdef DEBUG
     printf("\ntask_exit - BEFORE - [%d]", taskExec->id);
-#endif
 }
 
 void after_task_exit () {
     // put your customization here
+    printf("\n\nTask[%d] -- Execution time: %d ms || CPU time: %d ms || activations: %d\n\n", 
+        taskExec->id,systime() - taskExec->launch_timestamp, 
+        taskExec->running_time,
+        taskExec->activations);
 #ifdef DEBUG
     printf("\ntask_exit - AFTER- [%d]", taskExec->id);
-#endif
-    
+#endif 
 }
 
 void before_task_switch ( task_t *task ) {
