@@ -1,18 +1,9 @@
 #include<signal.h>
-
 #include "ppos.h"
 #include "ppos-disk-manager.h"
 #include "ppos-core-globals.h"
 #include "ppos-data.h"
 #include "disk-driver.h"
-
-// #define DISK_BLOCK_SIZE 64
-// #define DISK_SIZE 256
-
-//============================= STRUCTS =================================== // 
-
-
-//============================= GLOBALS =================================== // 
 
 task_t* disk_suspended_queue;
 diskrequest_t* disk_task_queue;
@@ -28,13 +19,13 @@ disk_t disk;
 struct sigaction disk_sig;
 int disk_sig_flag;
 
-//============================= FUNCTION DEFINITIONS =================================== // 
-
 void append_disk_task(diskrequest_t* task);
 
 void disk_append_ready_queue(task_t* task);
 
 void task_suspend_disk(task_t* task);
+
+int disk_sig_handler_setup();
 
 task_t* pop_suspend_queue();
 
@@ -49,8 +40,6 @@ diskrequest_t* sstf_disk_scheduler();
 diskrequest_t* cscan_disk_scheduler();
 
 diskrequest_t* fcfs_disk_scheduler();
-
-//============================= FUNCTION IMPLEMENTATION =================================== // 
 
 void disk_manager(void* args){
 
@@ -214,6 +203,7 @@ int disk_block_write(int block, void *buffer){
   //return operation status
   return 0;
 }
+void disk_sig_handler();
 
 int disk_sig_handler_setup(){
   disk_sig.sa_handler = disk_sig_handler;
